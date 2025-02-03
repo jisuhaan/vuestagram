@@ -1,15 +1,94 @@
 <script setup>
 import Post from './Post.vue';
+import FilterBox from './FilterBox.vue';
+import filterData from '@/data/Filterdata';
+import { ref } from 'vue';
 
-defineProps(['posts']);
+defineProps(['posts', 'step', 'imageUrl']);
+
+const filters = ref(filterData);
+const filter = ref('');
+
+// 필터 업데이트 함수
+const updateFilter = (selectedFilter) => {
+  filter.value = selectedFilter;
+};
 </script>
 
 <template>
-<div>
-  <Post v-for="(post, i) in posts" :key="'post-' + i" :posts="post"/>
-  <!--  1) for 문법에서 key값 설정해주지 않으면 자동으로 index로 설정됨. 
-        2) 컴포넌트 내부에서 직접 사용하지 않더라도 Vue가 내부적으로 처리하는 작업을 돕기 위해 바인딩을 하기도 함 ex) :key -->  
-</div>
+  <!-- 기본 포스트-->
+  <div v-if="step==0">
+    <Post v-for="(post, i) in posts" :key="'post-' + i" :posts="post"/>
+    <!--  1) for 문법에서 key값 설정해주지 않으면 자동으로 index로 설정됨. 
+          2) 컴포넌트 내부에서 직접 사용하지 않더라도 Vue가 내부적으로 처리하는 작업을 돕기 위해 바인딩을 하기도 함 ex) :key -->  
+  </div>
+
+  <!--필터 선택-->
+  <div v-if="step==1">
+    <div :class="`${filter} upload-image`" :style="{ backgroundImage:`url(${imageUrl})`}"></div>
+    <!-- CSSgram 필터 클래스 사용. index.html에 추가해둠. -->
+    <div class="filters">
+      <FilterBox
+        v-for="filterItem in filters" 
+        :key="filterItem" 
+        :imageUrl="imageUrl" 
+        :filter="filterItem" 
+        @filterName="updateFilter"
+        :isSelected="filter.value === filterItem" 
+      >
+        {{ filterItem }}
+      </FilterBox>
+    </div>
+  </div>
+
+  <!--글 작성 페이지-->
+  <div v-if="step==2">
+    <div :class="`${filter} upload-image`" :style="{ backgroundImage:`url(${imageUrl})`}"></div>
+    <div class="write">
+      <textarea class="write-box">write!</textarea>
+    </div>
+  </div>
 </template>
 
-<style></style>
+<style>
+.upload-image{
+width: 100%;
+height: 450px;
+background: black;
+background-size: contain;  /* 이미지의 전체를 보이게 합니다 */
+background-position: center;  /* 이미지가 중앙에 오도록 설정 */
+background-repeat: no-repeat; /* 이미지를 반복하지 않게 설정 */
+}
+.filters{
+overflow-x:scroll;
+white-space: nowrap;
+}
+.filters::-webkit-scrollbar {
+height: 5px;
+}
+.filters::-webkit-scrollbar-track {
+background: #f1f1f1; 
+}
+.filters::-webkit-scrollbar-thumb {
+background: #888; 
+border-radius: 5px;
+}
+.filters::-webkit-scrollbar-thumb:hover {
+background: #555; 
+}
+.write{
+margin-top: 10px;
+display: flex;
+justify-content: center;
+}
+.write-box {
+background-color: black;
+color: white;
+border: none;
+width: 90%;
+height: 100px;
+padding: 15px;
+display: block;
+outline: none;
+}
+</style>
