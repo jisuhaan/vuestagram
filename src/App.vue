@@ -7,9 +7,15 @@ import { ref } from 'vue';
 const buttonCount = ref(0);
 const step = ref(0);
 const imageUrl = ref('');
-
-// 게시물 데이터
 const posts = ref(Postdata); // Postdata에 새로운 데이터 추가됐을 때, 자동으로 템플릿에 반영되도록 ref로 선언.
+const filter = ref('');
+const postText = ref('');
+
+// 에밋 처리
+const handlePostText = (PostText) => {
+  postText.value = PostText.text;
+  filter.value = PostText.filter;
+};
 
 // 메서드
 // 1) 포스트 더보기 버튼
@@ -39,25 +45,54 @@ const upload = (e) => {
   } else {
     alert("이미지 파일만 업로드 가능합니다."); // 이미지가 아닌 경우 경고
   }
+};
 
+// 3) 포스트 저장
+const publish = () => {
+  var post = {
+    name: "David J",
+    userImage: "https://picsum.photos/100?random=22",
+    postImage: imageUrl.value,
+    likes: 22,
+    date: "May 15",
+    liked: false,
+    content: postText.value,
+    filter: filter.value
+  }
+  posts.value.unshift(post); 
+  // unshift: 배열 맨 위에 요소 추가
+  step.value = 0;
 };
 </script>
 
 <template>
   <div class="header">
+    <!-- 상단 왼쪽 버튼 -->
     <ul class="header-button-left">
-      <li>Cancel</li>
+      <li v-if="step === 0">Vuestagram</li>
+      <li v-if="step !== 0 && step !== 3" @click="step = 0">x</li>
+      <li v-if="step === 3" @click="step = 0">&lt;</li>
     </ul>
+
+    <!-- 상단 가운데 텍스트 -->
+    <ul class="logo">
+      <li v-if="step !== 3"><img src="./assets/logo.svg" class="logo" /></li>
+      <li v-if="step === 3">followers</li>
+    </ul>
+
+    <!-- 상단 오른쪽 버튼 -->
     <ul class="header-button-right">
-      <li>Next</li>
+      <li v-if="step === 0" @click="step = 3;">follower</li>
+      <li v-if="step === 1" @click="step++;">Next</li>
+      <li v-if="step === 2" @click="publish" @PostText="publish">공유</li>
     </ul>
-    <img src="./assets/logo.svg" class="logo" />
   </div>
 
-  <Container :posts="posts" :step="step" :imageUrl="imageUrl" />
-  <button class="show-button" @click="showMore">
-    더보기
-  </button>
+  <Container :posts="posts" :step="step" :imageUrl="imageUrl" @PostText="handlePostText" />
+
+  <div class="flex-container" style="width:100%" v-if="step === 0">
+      <button class="show-button" @click="showMore">더보기</button>
+  </div>
 
   <div class="flex-container" v-if="step==0">
     <div class="footer">
