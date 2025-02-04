@@ -11,6 +11,7 @@ const filter = ref('');
 
 // 필터 업데이트 함수
 const updateFilter = (selectedFilter) => {
+  console.log('Selected filter:', selectedFilter); // 로그 추가
   filter.value = selectedFilter;
 };
 </script>
@@ -33,8 +34,8 @@ const updateFilter = (selectedFilter) => {
         :key="filterItem" 
         :imageUrl="imageUrl" 
         :filter="filterItem" 
+        :isSelected="filter === filterItem"  
         @filterName="updateFilter"
-        :isSelected="filter.value === filterItem" 
       >
         {{ filterItem }}
       </FilterBox>
