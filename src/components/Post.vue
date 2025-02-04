@@ -8,7 +8,7 @@ defineProps(['posts']);
     <div class="profile" :style="{ backgroundImage: 'url(' + posts.userImage + ')' }"></div>
     <span class="profile-name">{{posts.name}}</span>
   </div>
-  <div class="post-body" :style="{ backgroundImage: 'url(' + posts.postImage + ')' }"></div>
+  <div :class="`${posts.filter} post-body`" :style="{ backgroundImage: 'url(' + posts.postImage + ')' }"></div>
   <div class="post-content">
     <p>{{posts.likes}} Likes</p>
     <p><strong>{{posts.name}}</strong> {{posts.content}}</p>

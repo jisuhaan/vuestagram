@@ -5,6 +5,7 @@ import filterData from '@/data/Filterdata';
 import { ref } from 'vue';
 
 defineProps(['posts', 'step', 'imageUrl']);
+const emit = defineEmits(['PostText']); // emit 이벤트 사용할 때엔 명시적으로 밝혀주기
 
 const filters = ref(filterData);
 const filter = ref('');
@@ -14,6 +15,11 @@ const updateFilter = (selectedFilter) => {
   console.log('Selected filter:', selectedFilter); // 로그 추가
   filter.value = selectedFilter;
 };
+
+// 포스트 텍스트 emit 함수
+const handleInput = (event) => {
+  emit('PostText', {text: event.target.value, filter: filter.value});
+}
 </script>
 
 <template>
@@ -46,7 +52,7 @@ const updateFilter = (selectedFilter) => {
   <div v-if="step==2">
     <div :class="`${filter} upload-image`" :style="{ backgroundImage:`url(${imageUrl})`}"></div>
     <div class="write">
-      <textarea class="write-box">write!</textarea>
+      <textarea class="write-box" @input="handleInput" placeholder="write!"></textarea>
     </div>
   </div>
 </template>
