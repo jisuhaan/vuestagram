@@ -1,6 +1,7 @@
 <script setup>
 import Post from './Post.vue';
 import FilterBox from './FilterBox.vue';
+import MyPage from './MyPage.vue';
 import filterData from '@/data/Filterdata';
 import { emitter } from '@/utils/eventBus';
 import { ref, onMounted, onUnmounted } from 'vue';
@@ -60,6 +61,11 @@ const handleInput = (event) => {
     <div class="write">
       <textarea class="write-box" @input="handleInput" placeholder="write!"></textarea>
     </div>
+  </div>
+
+  <!--팔로우 페이지-->
+  <div v-if="step==3">
+    <MyPage></MyPage>
   </div>
 </template>
 
