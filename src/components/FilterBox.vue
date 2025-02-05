@@ -1,4 +1,5 @@
 <script setup>
+import { emitter } from '@/utils/eventBus';
 import { ref } from 'vue';
 const props = defineProps({
   imageUrl: String,
@@ -6,13 +7,9 @@ const props = defineProps({
   isSelected: Boolean
 });
 
-
-// emit을 사용하여 이벤트를 정의
-const emit = defineEmits(['filterName']);
-
 // 클릭 시 부모에게 필터 이름을 전달하는 함수
 const selectFilter = (filter) => {
-  emit('filterName', props.filter);
+  emitter.emit('filter-selected', filter);
 };
 </script>
 

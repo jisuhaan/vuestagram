@@ -2,23 +2,30 @@
 import Post from './Post.vue';
 import FilterBox from './FilterBox.vue';
 import filterData from '@/data/Filterdata';
-import { ref } from 'vue';
+import { emitter } from '@/utils/eventBus';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 defineProps(['posts', 'step', 'imageUrl']);
 const emit = defineEmits(['PostText']); // emit 이벤트 사용할 때엔 명시적으로 밝혀주기
 
-const filters = ref(filterData);
-const filter = ref('');
+// 필터 업데이트 : mitt 활용하기
+onMounted(() => {
+  emitter.on('filter-selected', (selectedFilter) => {
+    filter.value = selectedFilter;
+  });
+});
 
-// 필터 업데이트 함수
-const updateFilter = (selectedFilter) => {
-  console.log('Selected filter:', selectedFilter); // 로그 추가
-  filter.value = selectedFilter;
-};
+// 마운트는 직접 해제해주는 습관 들이기
+onUnmounted(() => {
+  emitter.off('filter-selected');
+});
+
+const filterList = ref(filterData);
+const filter = ref('');
 
 // 포스트 텍스트 emit 함수
 const handleInput = (event) => {
-  emit('PostText', {text: event.target.value, filter: filter.value});
+  emit('PostText', event.target.value);
 }
 </script>
 
@@ -36,12 +43,11 @@ const handleInput = (event) => {
     <!-- CSSgram 필터 클래스 사용. index.html에 추가해둠. -->
     <div class="filters">
       <FilterBox
-        v-for="filterItem in filters" 
+        v-for="filterItem in filterList" 
         :key="filterItem" 
         :imageUrl="imageUrl" 
         :filter="filterItem" 
         :isSelected="filter === filterItem"  
-        @filterName="updateFilter"
       >
         {{ filterItem }}
       </FilterBox>

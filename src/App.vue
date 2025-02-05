@@ -2,7 +2,8 @@
 import Container from './components/Container.vue';
 import Postdata from './data/Postdata.js'
 import axios from 'axios'
-import { ref } from 'vue';
+import { emitter } from '@/utils/eventBus';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const buttonCount = ref(0);
 const step = ref(0);
@@ -13,9 +14,19 @@ const postText = ref('');
 
 // 에밋 처리
 const handlePostText = (PostText) => {
-  postText.value = PostText.text;
-  filter.value = PostText.filter;
+  postText.value = PostText;
 };
+
+// 필터 업데이트 : mitt 활용하기
+onMounted(() => {
+  emitter.on('filter-selected', (selectedFilter) => {
+    filter.value = selectedFilter;
+  });
+});
+
+onUnmounted(() => {
+  emitter.off('filter-selected');
+});
 
 // 메서드
 // 1) 포스트 더보기 버튼
