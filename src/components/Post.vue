@@ -1,5 +1,10 @@
 <script setup>
-defineProps(['posts']);
+import { usePostStore } from '@/stores/usePostStore';
+
+const postStore = usePostStore();
+const { updateLikes } = postStore;
+
+defineProps(['posts', 'index']);
 </script>
 
 <template>
@@ -10,7 +15,10 @@ defineProps(['posts']);
   </div>
   <div :class="`${posts.filter} post-body`" :style="{ backgroundImage: 'url(' + posts.postImage + ')' }"></div>
   <div class="post-content">
-    <p>{{posts.likes}} Likes</p>
+    <p @click="updateLikes(index)" class="likes">
+      <i :class="posts.liked ? 'fas fa-heart' : 'far fa-heart'"></i>
+      {{posts.likes}} Likes
+    </p>
     <p><strong>{{posts.name}}</strong> {{posts.content}}</p>
     <p class="date">{{posts.date}}</p>
   </div>
@@ -54,4 +62,11 @@ defineProps(['posts']);
   color: grey;
   margin-top: -8px;
 } 
+.likes {
+  cursor: pointer;
+}
+.fas, .far {
+  margin-right: 5px;
+  color: red;
+}
 </style>
