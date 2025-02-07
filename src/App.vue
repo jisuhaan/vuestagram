@@ -1,16 +1,16 @@
 <script setup>
 import Container from './components/Container.vue';
-import Postdata from './data/Postdata.js'
 import axios from 'axios'
 import { emitter } from '@/utils/eventBus';
+import { usePostStore } from '@/stores/usePostStore';
 import { ref, onMounted, onUnmounted } from 'vue';
 
-const buttonCount = ref(0);
+const postStore = usePostStore(); // 스토어 생성 함수 호출. *definStore로 만든 함수이기에 뒤에 () 붙이는 것
+
 const step = ref(0);
 const imageUrl = ref('');
-const posts = ref(Postdata); // Postdata에 새로운 데이터 추가됐을 때, 자동으로 템플릿에 반영되도록 ref로 선언.
 const filter = ref('');
-const postText = ref('');
+const postText = ref(''); // 작성 게시글
 
 // 에밋 처리
 const handlePostText = (PostText) => {
@@ -29,19 +29,7 @@ onUnmounted(() => {
 });
 
 // 메서드
-// 1) 포스트 더보기 버튼
-const showMore = () => {
-  axios.get(`https://codingapple1.github.io/vue/more${buttonCount.value}.json`)
-  // 템플릿 리터럴(` 백틱) : 변수를 ${} 구문을 통해 문자열 안에 포함시키고 싶을 때에 사용. 일반 따옴표로 처리하면 x.
-    .then(response => {
-      buttonCount.value++;
-      posts.value.push(response.data);
-    })
-    .catch(error => {
-      console.error("데이터를 불러오는 중 오류 발생:", error);
-    });
-};
-// 2) 사진 업로드
+// 사진 업로드
 const upload = (e) => {
   let file = e.target.files[0];
   // e.target.files[0]은 Blob 객체. 
@@ -58,9 +46,9 @@ const upload = (e) => {
   }
 };
 
-// 3) 포스트 저장
+// 포스트 저장
 const publish = () => {
-  var post = {
+  var newPost = {
     name: "David J",
     userImage: "https://picsum.photos/100?random=22",
     postImage: imageUrl.value,
@@ -70,10 +58,13 @@ const publish = () => {
     content: postText.value,
     filter: filter.value
   }
-  posts.value.unshift(post); 
+  posts.unshift(newPost); // postStore.posts는 ref가 아니라 Pinia의 state 변수이므로 .value 붙이면 x
+  // defineStore 함수 내부에서는 ref를 자동으로 풀어서 반환해 주기 때문!
   // unshift: 배열 맨 위에 요소 추가
   step.value = 0;
 };
+
+const { loadMorePosts, posts } = postStore; // 구조 분해 할당. 
 </script>
 
 <template>
@@ -95,14 +86,14 @@ const publish = () => {
     <ul class="header-button-right">
       <li v-if="step === 0" @click="step = 3;">follower</li>
       <li v-if="step === 1" @click="step++;">Next</li>
-      <li v-if="step === 2" @click="publish" @PostText="publish">공유</li>
+      <li v-if="step === 2" @click="publish">공유</li>
     </ul>
   </div>
 
   <Container :posts="posts" :step="step" :imageUrl="imageUrl" @PostText="handlePostText" />
 
   <div class="flex-container" style="width:100%" v-if="step === 0">
-      <button class="show-button" @click="showMore">더보기</button>
+      <button class="show-button" @click="loadMorePosts">더보기</button>
   </div>
 
   <div class="flex-container" v-if="step==0">
