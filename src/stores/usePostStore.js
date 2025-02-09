@@ -40,7 +40,7 @@ export const usePostStore = defineStore('post', () => {
         }
     ]);
     const updateLikes = (idx) => {
-        if (posts.value[idx].liked) {
+        if (!posts.value[idx].liked) {
             posts.value[idx].likes++;
         } else {
             posts.value[idx].likes--;
