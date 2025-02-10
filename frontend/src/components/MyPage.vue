@@ -20,7 +20,7 @@ const filteredFollowers = computed(() => {
     followers.value;
 });
 
-const removeFollwer = (followerId) => {
+const removeFollower = (followerId) => {
   try {
     followers.value = followers.value.filter(f => f.id !== followerId); // 화면에서 삭제
     followersOrigin.value = [...followers.value]; // 원본도 업데이트
@@ -32,29 +32,91 @@ const removeFollwer = (followerId) => {
 </script>
 
 <template>
-  <div style="padding: 10px">
-    <div class="flex-container">
-      <input class="search-box" placeholder="🔍 검색" v-model="searchInput" />
+  <div class="followers">
+    <div class="followers__search-container">
+      <input class="followers__search-box" placeholder="🔍 검색" v-model="searchInput" />
     </div>
-    <div class="post-box">
-      <div class="post-header" v-for="follower in filteredFollowers" :key="follower">
-        <div class="profile" :style="{ backgroundImage: `url(${follower.image})` }"></div>
-        <span class="profile-name">{{ follower.name }}</span>
-        <button @click="removeFollwer(follower.id)">X</button>
+    <div class="followers__list">
+      <div class="followers__item" v-for="follower in filteredFollowers" :key="follower.id">
+        <div class="followers__item-profile" :style="{ backgroundImage: `url(${follower.image})` }"></div>
+        <span class="followers__item-name">{{ follower.name }}</span>
+        <button class="followers__remove-button" @click="removeFollower(follower.id)">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
   </div>
 </template>
 
-<style>
-.search-box{
-    width: 90%;
-    height: 23px;
-    background-color: #ddd;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+<style scoped>
+.followers {
+  padding: 10px;
 }
-.post-box{
-    margin-top: 20px;
+
+.followers__search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.followers__search-box {
+  width: 90%;
+  height: 40px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding-left: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.followers__list {
+  margin-top: 40px;
+}
+
+.followers__item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.followers__item-profile {
+  width: 45px;
+  height: 45px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.followers__item-name {
+  font-size: 16px;
+  color: #333;
+  flex-grow: 1;
+}
+
+.followers__remove-button {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #f00;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.2s ease;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.followers__remove-button:hover {
+  transform: scale(1.2) translateY(-50%);
+  color: #d80000;
+}
+
+.followers__remove-button:focus {
+  outline: none;
 }
 </style>

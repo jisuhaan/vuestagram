@@ -77,7 +77,7 @@ const { loadMorePosts, posts } = postStore; // 구조 분해 할당.
     </ul>
 
     <!-- 상단 가운데 텍스트 -->
-    <ul class="logo">
+    <ul class="logo" :style="{ right: step === 3 ? '50px' : '0' }">
       <li v-if="step !== 3"><img src="./assets/logo.svg" class="logo" /></li>
       <li v-if="step === 3">followers</li>
     </ul>
@@ -124,4 +124,5 @@ const { loadMorePosts, posts } = postStore; // 구조 분해 할당.
   display: flex;
   justify-content: center;
 }
+
 </style>
