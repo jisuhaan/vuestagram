@@ -3,6 +3,7 @@ package com.vuestagram.backend.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vuestagram.backend.dto.PostDTO;
 import com.vuestagram.backend.entity.Post;
 import com.vuestagram.backend.serivice.PostService;
+
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -25,9 +28,16 @@ public class PostController {
 	public PostController (PostService postService) {
 		this.postService = postService;
 	}
+	
+	 // 모든 포스트 가져오기
+    @GetMapping("/more")
+    public List<PostDTO> getAllPosts() {
+        return postService.getAllPosts();
+    }
 
-	@GetMapping("/more")
-    public List<Post> getPosts(@RequestParam String filter, @RequestParam int filter) {
-        return postService.getPosts();  // 포스트 리스트를 반환
+    // 새 포스트 생성
+    @PostMapping
+    public PostDTO createPost(@RequestBody PostDTO postDTO) {
+        return postService.createPost(postDTO);
     }
 }
