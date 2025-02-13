@@ -2,6 +2,8 @@ package com.vuestagram.backend.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vuestagram.backend.dto.PostDTO;
+import com.vuestagram.backend.dto.PostsResponseDTO;
+import com.vuestagram.backend.dto.ResponseDTO;
 import com.vuestagram.backend.entity.Post;
 import com.vuestagram.backend.serivice.PostService;
 
@@ -31,8 +35,9 @@ public class PostController {
 	
 	 // 모든 포스트 가져오기
     @GetMapping("/more")
-    public List<PostDTO> getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity<PostsResponseDTO> getAllPosts() {
+    	List<PostDTO> posts = postService.getAllPosts();
+    	return ResponseEntity.ok(new PostsResponseDTO(posts));
     }
 
     // 새 포스트 생성

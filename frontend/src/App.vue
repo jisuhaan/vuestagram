@@ -1,9 +1,19 @@
 <script setup>
 import Container from './components/Container.vue';
-import axios from 'axios'
+import axios from '@/axios';
 import { emitter } from '@/utils/eventBus';
 import { usePostStore } from '@/stores/usePostStore';
 import { ref, onMounted, onUnmounted } from 'vue';
+
+
+const fetchPosts = async () => {
+  try {
+    const response = await axios.get('/api/posts/more');  // /posts 엔드포인트 호출
+    posts.value = response.data;  // 받은 데이터 posts에 저장
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+  }
+};
 
 const postStore = usePostStore(); // 스토어 생성 함수 호출. *definStore로 만든 함수이기에 뒤에 () 붙이는 것
 
@@ -19,9 +29,11 @@ const handlePostText = (PostText) => {
 
 // 필터 업데이트 : mitt 활용하기
 onMounted(() => {
+  fetchPosts();  // 컴포넌트가 마운트될 때 데이터 불러오기
   emitter.on('filter-selected', (selectedFilter) => {
     filter.value = selectedFilter;
   });
+  console.log("Component mounted, fetchPosts called"); // 컴포넌트 마운트 확인용 로그
 });
 
 onUnmounted(() => {
