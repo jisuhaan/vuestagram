@@ -1,5 +1,8 @@
 package com.vuestagram.backend.serivice;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +37,15 @@ public class PostService {
     }
 	
 	// 모든 포스트 가져오기
-    public List<PostDTO> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        return posts.stream()
+    public List<PostDTO> getPosts(int offset, int limit) { // 무한 스크롤 방식이어도 페이징처리하는 게 서버 성능에 적절
+    	Pageable pageable = PageRequest.of(offset / limit, limit);
+    	Page<Post> posts = postRepository.findAll(pageable); // 페이지 객체로 결과 가져오기
+        List<PostDTO> postDTOs = posts.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
+        return postDTOs;
+        // 혹은 총 페이지 수, 총 요소 수 포함한 응답 객체 반환하는 것도 방법!
+//        return new PostsResponseDTO(postDTOs, postPage.getTotalElements(), postPage.getTotalPages()); 
     }
     
     

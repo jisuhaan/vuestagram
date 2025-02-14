@@ -69,13 +69,11 @@ const loadMorePostsWithOne = () => {
 };
 
 // 스크롤 이벤트 핸들러
-const handleScroll = () => {
-  // 스크롤 위치가 페이지 맨 아래에 도달하면 더 많은 포스트 로드
+const handleScroll = throttle(() => { // 쓰로틀링으로 성능 개선
   if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 5) {
-    // 5px 여유를 두고 스크롤이 끝까지 내려갔다고 판단
-      fetchPosts();
+    fetchPosts();
   }
-};
+}, 200);
 
 // 메서드
 // 사진 업로드
