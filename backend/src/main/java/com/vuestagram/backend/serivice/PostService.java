@@ -23,6 +23,7 @@ public class PostService {
 
 	@PostConstruct
     public void init() {
+		postRepository.deleteAll();
         // 테스트용 데이터 삽입
 		Post post1 = new Post("Kim Hyun", "https://picsum.photos/100?random=3", "https://picsum.photos/600?random=3", 36, "May 15", false, "오늘 무엇을 했냐면요 아무것도 안했어요 ?", "perpetua");
         Post post2 = new Post("John Doe", "https://picsum.photos/100?random=4", "https://picsum.photos/600?random=4", 20, "Apr 20", false, "흔한 자랑스타그램", "clarendon");

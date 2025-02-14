@@ -8,7 +8,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 
 const fetchPosts = async () => {
   try {
-    const response = await axios.get('/api/posts/more');  // /posts 엔드포인트 호출
+    const response = await axios.get('/posts/more');  // /posts 엔드포인트 호출
     posts.value = response.data;  // 받은 데이터 posts에 저장
   } catch (error) {
     console.error('Error fetching posts:', error);
