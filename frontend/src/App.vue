@@ -5,17 +5,12 @@ import { emitter } from '@/utils/eventBus';
 import { usePostStore } from '@/stores/usePostStore';
 import { ref, onMounted, onUnmounted } from 'vue';
 
-
-const fetchPosts = async () => {
-  try {
-    const response = await axios.get('/posts/more');  // /posts 엔드포인트 호출
-    posts.value = response.data;  // 받은 데이터 posts에 저장
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-  }
-};
+const postListResponse = ref([]); // 포스트 리스트 저장할 배열
+const limit = ref(3); // 한 번에 불러올 데이터 수
+const isLoading = ref(false); // 로딩 상태
 
 const postStore = usePostStore(); // 스토어 생성 함수 호출. *definStore로 만든 함수이기에 뒤에 () 붙이는 것
+const { loadMorePosts, posts } = postStore; // 구조 분해 할당. 
 
 const step = ref(0);
 const imageUrl = ref('');
@@ -33,12 +28,54 @@ onMounted(() => {
   emitter.on('filter-selected', (selectedFilter) => {
     filter.value = selectedFilter;
   });
-  console.log("Component mounted, fetchPosts called"); // 컴포넌트 마운트 확인용 로그
+
+  // 스크롤 이벤트 리스너 등록
+  window.addEventListener('scroll', handleScroll);
 });
 
 onUnmounted(() => {
   emitter.off('filter-selected');
+  window.removeEventListener('scroll', handleScroll); // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
 });
+
+
+const fetchPosts = async (customLimit = limit.value) => {
+  if (isLoading.value) return; // 이미 로딩 중이면 중복 호출 방지
+  isLoading.value = true; // 로딩 상태 시작
+
+  try {
+    const offset = postListResponse.value.length;
+    const response = await axios.get('/posts/more',{
+      params: {
+        offset: offset,
+        limit: customLimit,
+      }
+    });
+    console.log(response.data); // 응답 데이터 확인
+    // 응답 받은 데이터를 배열에 추가
+    if (response.data.body.length > 0) {
+      postListResponse.value.push(...response.data.body);
+    }
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 더보기 버튼 클릭 시
+const loadMorePostsWithOne = () => {
+  fetchPosts(1); // limit 값을 1로 설정
+};
+
+// 스크롤 이벤트 핸들러
+const handleScroll = () => {
+  // 스크롤 위치가 페이지 맨 아래에 도달하면 더 많은 포스트 로드
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 5) {
+    // 5px 여유를 두고 스크롤이 끝까지 내려갔다고 판단
+      fetchPosts();
+  }
+};
 
 // 메서드
 // 사진 업로드
@@ -70,13 +107,13 @@ const publish = () => {
     content: postText.value,
     filter: filter.value
   }
-  posts.unshift(newPost); // postStore.posts는 ref가 아니라 Pinia의 state 변수이므로 .value 붙이면 x
+  postListResponse.unshift(newPost); 
+  
+  // postStore.posts는 ref가 아니라 Pinia의 state 변수이므로 .value 붙이면 x
   // defineStore 함수 내부에서는 ref를 자동으로 풀어서 반환해 주기 때문!
   // unshift: 배열 맨 위에 요소 추가
   step.value = 0;
 };
-
-const { loadMorePosts, posts } = postStore; // 구조 분해 할당. 
 </script>
 
 <template>
@@ -102,10 +139,10 @@ const { loadMorePosts, posts } = postStore; // 구조 분해 할당.
     </ul>
   </div>
 
-  <Container :posts="posts" :step="step" :imageUrl="imageUrl" @PostText="handlePostText" />
+  <Container :posts="postListResponse" :step="step" :imageUrl="imageUrl" @PostText="handlePostText" />
 
   <div class="flex-container" style="width:100%" v-if="step === 0">
-      <button class="show-button" @click="loadMorePosts">더보기</button>
+      <button class="show-button" @click="loadMorePostsWithOne">더보기</button>
   </div>
 
   <div class="flex-container" v-if="step==0">
