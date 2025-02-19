@@ -3,6 +3,8 @@ package com.vuestagram.backend.serivice;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +43,13 @@ public class PostService {
     	
     	Pageable pageable = PageRequest.of(offset / limit, limit);
     	Page<Post> posts = postRepository.findAll(pageable); // 페이지 객체로 결과 가져오기
+    	
+    	if (posts.isEmpty()) {
+            // 데이터가 없으면 더미 데이터를 반환 (여기서 count를 설정)
+            List<PostDTO> dummyPosts = generateDummyPostsDTO(3); // 5개의 더미 데이터를 반환
+            return dummyPosts;
+        }
+    	
         List<PostDTO> postDTOs = posts.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
@@ -49,6 +58,31 @@ public class PostService {
 //        return new PostsResponseDTO(postDTOs, postPage.getTotalElements(), postPage.getTotalPages()); 
     }
     
+    // 더미 데이터 생성 메서드 : 단일 책임의 원칙 따라 분리
+    private List<Post> generateDummyPosts(int count) {
+        List<Post> dummyPosts = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Post dummyPost = new Post();
+            dummyPost.setName("User " + (i + 1));
+            dummyPost.setUserImage("https://picsum.photos/100?random=" + (Math.random() * 1000));
+            dummyPost.setPostImage("https://picsum.photos/400/300?random=" + (Math.random() * 1000));
+            dummyPost.setLikes((int) (Math.random() * 1000));
+            dummyPost.setDate("2025-02-19");
+            dummyPost.setLiked(Math.random() > 0.5); // 랜덤으로 좋아요 여부
+            dummyPost.setContent("This is a dummy post #" + (i + 1));
+            dummyPost.setFilter("all");
+
+            dummyPosts.add(dummyPost);
+        }
+        return dummyPosts;
+    }
+
+    // 더미 데이터를 DTO로 반환하는 메서드
+    private List<PostDTO> generateDummyPostsDTO(int count) {
+        return generateDummyPosts(count).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
     
     // 새 포스트 저장
     public PostDTO createPost(PostDTO postDTO) {
