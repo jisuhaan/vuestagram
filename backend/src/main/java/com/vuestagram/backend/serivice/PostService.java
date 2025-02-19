@@ -38,6 +38,7 @@ public class PostService {
 	
 	// 모든 포스트 가져오기
     public List<PostDTO> getPosts(int offset, int limit) { // 무한 스크롤 방식이어도 페이징처리하는 게 서버 성능에 적절
+    	
     	Pageable pageable = PageRequest.of(offset / limit, limit);
     	Page<Post> posts = postRepository.findAll(pageable); // 페이지 객체로 결과 가져오기
         List<PostDTO> postDTOs = posts.stream()

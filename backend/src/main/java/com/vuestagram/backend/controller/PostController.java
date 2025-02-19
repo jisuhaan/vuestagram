@@ -36,8 +36,9 @@ public class PostController {
 	 // 모든 포스트 가져오기
 	@GetMapping("/more")
     public ResponseEntity<PostsResponseDTO> getAllPosts(
-            @RequestParam(defaultValue = "0") int offset,  // 기본값 0
-            @RequestParam(defaultValue = "3") int limit) { // 기본값 3
+            @RequestParam(name = "offset", defaultValue = "0") int offset,  // 기본값 0
+            @RequestParam(name = "limit", defaultValue = "3") int limit) { // 기본값 3
+		// 
         List<PostDTO> posts = postService.getPosts(offset, limit);  // 서비스에서 페이징 처리된 데이터를 가져옴
         return ResponseEntity.ok(new PostsResponseDTO(posts));  // 응답
     }
