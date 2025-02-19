@@ -1,6 +1,7 @@
 <script setup>
 import Container from './components/Container.vue';
 import axios from '@/axios';
+import throttle from 'lodash.throttle';
 import { emitter } from '@/utils/eventBus';
 import { usePostStore } from '@/stores/usePostStore';
 import { ref, onMounted, onUnmounted } from 'vue';
