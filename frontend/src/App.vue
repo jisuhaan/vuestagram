@@ -69,13 +69,17 @@ const loadMorePostsWithOne = () => {
   fetchPosts(1); // limit 값을 1로 설정
 };
 
+const scrollCount = ref(0);  // 스크롤 카운트 추가
+
 // 스크롤 이벤트 핸들러
-const handleScroll = throttle(() => { // 쓰로틀링으로 성능 개선
+const handleScroll = throttle(() => {
   if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 5) {
-    fetchPosts();
+    if (scrollCount.value < 5) {
+      fetchPosts();
+      scrollCount.value++;
+    }
   }
 }, 200);
-
 // 메서드
 // 사진 업로드
 const upload = (e) => {
